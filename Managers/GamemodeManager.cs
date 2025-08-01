@@ -32,7 +32,7 @@ namespace AirlockAPI.Managers
 
             if (menu != null)
             {
-                if (menu._modeInfoCollection._activeModesAndMaps.Modes.Count >= 4)
+                if (menu._modeInfoCollection._activeModesAndMaps.RuntimeModes.Count >= 4)
                 {
                     foreach (GamemodeSelectionMenu selectMenu in FindObjectsOfType<GamemodeSelectionMenu>(true))
                     {
@@ -60,7 +60,7 @@ namespace AirlockAPI.Managers
 
                 if (RegisteredCustomModes.Contains(name + "_" + description))
                 {
-                    menu._modeInfoCollection._activeModesAndMaps.Modes.Add("<size=0>MODDED</size><color=yellow>" + name);
+                    menu._modeInfoCollection._activeModesAndMaps.RuntimeModes.Add("<size=0>MODDED</size><color=yellow>" + name);
                     return;
                 }
 
@@ -106,7 +106,7 @@ namespace AirlockAPI.Managers
                     menu._modeInfoCollection.Modes.Add(newMode);
                 }
 
-                menu._modeInfoCollection._activeModesAndMaps.Modes.Add(newMode.ModeName);
+                menu._modeInfoCollection._activeModesAndMaps.RuntimeModes.Add(newMode.ModeName);
                 RegisteredCustomModes.Add(name + "_" + description);
             }
         }

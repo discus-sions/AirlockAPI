@@ -1,12 +1,20 @@
 ﻿using AirlockAPI.Attributes;
+using AirlockAPI.Data;
+using AirlockAPI.Debug;
+using AirlockAPI.Handlers;
 using AirlockAPI.Managers;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using System.Reflection;
+using UnityEngine;
 
 namespace AirlockAPI.Main
 {
     internal class Loader : MelonMod
     {
+        List<Type> GamemodeHandlerTypes = new List<Type>();
+
         public override void OnLateInitializeMelon()
         {
             MelonBase[] melons = MelonBase.RegisteredMelons.ToArray();
@@ -30,6 +38,31 @@ namespace AirlockAPI.Main
                                 NetworkManager.RegisteredRpcs.Add(rpc, method);
                             }
                         }
+
+                        if (type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(CustomGameHandler)))
+                        {
+                            if (!ClassInjector.IsTypeRegisteredInIl2Cpp(type))
+                            {
+                                ClassInjector.RegisterTypeInIl2Cpp(type);
+                            }
+                            GamemodeHandlerTypes.Add(type);
+
+                            Logging.Log("Found Gamemode Script: " + type.Name);
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+        {
+            if (sceneName != "Boot" && sceneName != "Title")
+            {
+                foreach (Type type in GamemodeHandlerTypes)
+                {
+                    if (type.Name.ToLower().Replace(" ", "").Contains(CurrentMode.Name.ToLower().Replace(" ", "")))
+                    {
+                        new GameObject("AIRLOCKAPI").AddComponent(Il2CppType.From(type));
                     }
                 }
             }
